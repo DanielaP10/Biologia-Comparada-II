@@ -8,7 +8,7 @@
     `      \(/|\)/       `              Datation of subfamily Desmodontinae, family Phyllostomidae        
             " ` "                                                                                         
 
-In this repository are my script of Rev Bayes and the data that I use in my proyect of Comparative Biology II.
+In this repository is my script of Rev Bayes and the data that I used in my proyect of Comparative Biology II.
 
 The central script is Desmo_dating.rev, where there are the priors and parameters of my analysis.
 
