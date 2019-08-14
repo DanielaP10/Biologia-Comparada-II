@@ -157,6 +157,4 @@ monitors.append( mnScreen(printgen=10, root_time, diversification) )
 
 ## mcmc
 mymcmc = mcmc(mymodel, monitors, moves)
-mymcmc.run(generations=1000)
-
-#source("pp/Desmo_dating.rev")
+mymcmc.run(generations=100000)
