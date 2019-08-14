@@ -1,11 +1,10 @@
-
-    /\                 /\                                                                                 
-   / \'._   (\_/)   _.'/ \                              Daniela Pachón Prada                              
-  /_.''._'--('w')--'_.''._\                                                                               
-  | \_ / `;=/ " \=;` \ _/ |                          Comparative Biology proyect                          
-   \/ `\__|`\___/`|__/`  \/                                                                               
-    `      \(/|\)/       `             Datation of subfamily Desmodontinae, family Phyllostomidae        
-            " ` "                                                                                         
+      /\                 /\  
+     / \'._   (\_/)   _.'/ \                              Daniela Pachón Prada 
+    /_.''._'--('w')--'_.''._\                       
+    | \_ / `;=/ " \=;` \ _/ |                          Comparative Biology proyect  
+     \/ `\__|`\___/`|__/`  \/                                                                              
+      `      \(/|\)/       `             Datation of subfamily Desmodontinae, family Phyllostomidae        
+              " ` "                                                                                         
 
 In this repository is my script of Rev Bayes and the data that I used in my proyect of Comparative Biology II.
 
