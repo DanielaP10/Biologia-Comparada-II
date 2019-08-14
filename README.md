@@ -1,4 +1,3 @@
-# Comparadita-II
 
     /\                 /\                                                                                 
    / \'._   (\_/)   _.'/ \                              Daniela Pachón Prada                              
