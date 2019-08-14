@@ -1,3 +1,1 @@
-raxmlHPC -s concatenado.phy -m GTRGAMMA -p 102215 -q parti.part -# 30 -n C1 -o Mormoops_megalophylla,Noctilio_leporinus,Noctilio_albiventris
-
 ./raxml-ng --msa concatenado_CO.phy --model parti.part --prefix D1 --tree pars{25},rand{25}
