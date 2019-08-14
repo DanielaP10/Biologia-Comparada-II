@@ -1,5 +1,5 @@
 # Comparadita-II
-############################################################################################
+
     /\                 /\                                                                                 
    / \'._   (\_/)   _.'/ \                              Daniela Pachón Prada                              
   /_.''._'--('w')--'_.''._\                                                                               
@@ -7,7 +7,6 @@
    \/ `\__|`\___/`|__/`  \/                                                                               
     `      \(/|\)/       `              Datation of subfamily Desmodontinae, family Phyllostomidae        
             " ` "                                                                                         
-############################################################################################################
 
 In this repository are my script of Rev Bayes and the data that I use in my proyect of Comparative Biology II.
 
