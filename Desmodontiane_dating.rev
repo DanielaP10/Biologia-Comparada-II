@@ -1,0 +1,146 @@
+######################################################################
+##                      Desmodontinae dating                        ##
+##          Daniela Pachón Prada - Biología Comparada II            ## 
+######################################################################
+
+## Reading molecular matrix and tree
+data <- readDiscreteCharacterData("pp/concatenado_SO.nex")
+t <- readTrees("pp/ML_tree.tre")[1]
+
+## Create moves and monitor vectors
+moves    = VectorMoves()
+monitors = VectorMonitors()
+
+######################################################################
+#                    Birth-Death Process                             #
+######################################################################
+
+## some variables
+n_taxa <- t.ntips()
+taxa <- t.taxa()
+
+## speciation and extition rates. This rates are equal because death 
+## and birth rate behave in the same way
+spe_rate ~ dnExponential (10)
+ext_rate ~ dnExponential (10)
+
+## define moves on speciation and extintion rates
+moves.append( mvScale(spe_rate, lambda=0.5,tune=true,weight=3.0) )
+moves.append( mvScale(ext_rate, lambda=0.5,tune=true,weight=3.0) )
+
+## diversificartion rate
+diversification := spe_rate - ext_rate
+
+## Probability sampling. There are 214 species in family Phyllostomidae,
+## in this analysis I include 36 of these species: 36/214=0.14
+rho <- 0.14
+
+## Age range of the oldest fossil of Phyllostomidae, 
+## genus Notonycteris
+Notonycteris <- 13
+
+## 23.03-11.63 = 11.4
+mean_ra <- 11.4
+stdv_ra <- 0.25
+
+## the lognormal distribution is parameterized by mu which is a 
+##function of the mean and standard deviation
+mu_ra <- ln(mean_ra) - ((stdv_ra*stdv_ra) * 0.5)
+root_time ~ dnLnorm(mu_ra, stdv_ra, offset=Notonycteris)
+
+## birdth-death process
+tree_age ~ dnBDP(lambda=spe_rate, mu=ext_rate, rho=rho, 
+rootAge=root_time, samplingStrategy="uniform", condition="nTaxa",
+taxa=taxa)
+
+## Specify the clade of interest
+Desmodontinae = clade("Desmodus_rotundus",
+"Diphylla_ecaudata","Diaemus_youngi")
+
+## Monitor the age of Desmodontinae
+tmrca_Desmodontinae := tmrca(tree_age,Desmodontinae)
+
+### add moves on the root time 
+moves.append (mvSlide(root_time, delta=1.0, tune=true, weight=10.0))
+moves.append (mvScale(root_time, lambda=1.0, tune=true, weight=10.0))
+
+######################################################################
+##               Ucorelated relaxed molecular clock                 ##
+######################################################################
+
+
+## Number of branch in the tree
+n_branches <- 2 * n_taxa - 2
+
+## Set moves to each branch length
+for(i in 1:n_branches){
+    branch_rates[i] ~ dnLnorm(1.5, 0.8)
+    moves.append (mvScale(branch_rates[i],lambda=1.0,tune=true,
+    weight=1.0))
+}
+
+# add a move on the branch rate vector #
+moves.append( mvVectorScale(branch_rates, lambda=0.5, tune=true, 
+weight=1.0) )
+
+
+######################################################################
+##             MOLECULAR EVOLUTION MODEL - GTR+G                    ##
+######################################################################
+
+## base frequence prior
+bf <- v(1,1,1,1)
+bfreq ~ dnDirichlet(bf)
+
+## sustitution rate prior
+sr <- v(1,1,1,1,1,1)
+srate ~ dnDirichlet(sr)
+
+## generate Q matrix
+Q := fnGTR(srate,bfreq)
+
+## assing moves to bfreq and srate
+moves.append (mvSimplexElementScale(bfreq, alpha=10.0, tune=true, 
+weight=1.0))
+moves.append (mvSimplexElementScale(srate, alpha=10.0, tune=true, 
+weight=1.0))
+
+## asing gamma distribution
+alpha ~ dnUniform( 0.0, 1E6 )
+
+gamma_rates := fnDiscretizeGamma( alpha, alpha, 4, false )
+
+moves.append( mvScale(alpha, lambda=0.1, tune=false, weight=3.0) )
+
+# Create the substitution model and clamp with our observed DNA data #
+phySeq ~ dnPhyloCTMC(tree=tree_age, Q=Q, siteRates=gamma_rates, 
+branchRates=branch_rates, type="DNA")
+
+phySeq.clamp(data)
+
+######################################################################
+##                         MCMC runing                              ##
+######################################################################
+
+mymodel = model(srate)
+
+## monitor for the full model
+monitors.append( mnModel(filename="pp_out/bats4_nodedate.log", printgen=10)	)
+
+## monitor for the tree
+monitors.append( mnFile(filename="pp_out/bats4_nodedate.trees", printgen=200, tree_age) )
+
+## monitor for the screen
+monitors.append( mnScreen(printgen=10, root_time, diversification) )
+
+## mcmc
+mymcmc = mcmc(mymodel, monitors, moves)
+mymcmc.burnin(generations=5000,tuningInterval=200)
+mymcmc.run(generations=300000)
+
+## consensus tree
+tree_trace = readTreeTrace("pp_out/bats4_nodedate.trees", burnin=0.25)
+map_tree = consensusTree(trace=tree_trace, cutoff=0.5, file="pp_out/consensus4.tree")
+
+# Maximum clade credibility tree #
+mccTree(tree_trace, file="pp_out/bats4_nodedate.mcc.tre" )
